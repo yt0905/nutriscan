@@ -1,0 +1,132 @@
+food_label,food_name_display,serving_size_g,calories_per_100g,protein_per_100g,carbs_per_100g,fat_per_100g,fiber_per_100g,source
+ais_kacang,Ais Kacang,300,84.0,1.2,19.8,0.8,1.3,MyFCD / Nutrient Composition of Malaysian Foods (IMR)
+apam_balik,Apam Balik,150,258.0,5.1,41.3,8.2,1.4,Nutrient Composition of Malaysian Foods (IMR)
+apple_pie,Apple Pie,80,300.0,2.5,45.0,12.5,2.5,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+asam_laksa,Asam Laksa,400,64.0,3.1,9.8,1.5,1.2,MyFCD / Nutrient Composition of Malaysian Foods (IMR)
+baby_back_ribs,Baby Back Ribs,150,360.0,25.33,10.0,22.0,0.67,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+bak_kut_teh,Bak Kut Teh,350,79.0,8.1,2.8,3.9,0.5,Nutrient Composition of Malaysian Foods (IMR)
+baklava,Baklava,50,330.0,6.0,40.0,16.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+beef_carpaccio,Beef Carpaccio,100,200.0,20.0,1.0,12.0,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+beef_tartare,Beef Tartare,100,250.0,25.0,2.0,15.0,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+beet_salad,Beet Salad,100,80.0,3.0,12.0,2.0,3.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+beignets,Beignets,50,400.0,6.0,50.0,20.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+bibimbap,Bibimbap,300,150.0,5.0,20.0,4.0,1.67,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+biryani,Biryani,350,179.0,8.8,24.6,5.2,1.3,USDA FoodData Central
+bread_pudding,Bread Pudding,100,250.0,6.0,35.0,10.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+breakfast_burrito,Breakfast Burrito,200,200.0,10.0,20.0,7.5,2.5,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+bruschetta,Bruschetta,50,200.0,6.0,30.0,8.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+caesar_salad,Caesar Salad,200,150.0,5.0,7.5,10.0,1.5,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+cannoli,Cannoli,50,400.0,8.0,50.0,20.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+caprese_salad,Caprese Salad,150,133.33,5.33,6.67,10.0,1.33,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+carrot_cake,Carrot Cake,100,350.0,4.0,45.0,18.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+ceviche,Ceviche,150,133.33,13.33,6.67,3.33,1.33,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+char_kway_teow,Char Kway Teow,300,163.0,7.2,21.8,5.7,1.1,MyFCD / Nutrient Composition of Malaysian Foods (IMR)
+cheese_plate,Cheese Plate,150,300.0,13.33,3.33,23.33,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+cheesecake,Cheesecake,100,350.0,6.0,30.0,22.0,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+chicken_curry,Chicken Curry,200,150.0,10.0,7.5,7.5,1.5,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+chicken_quesadilla,Chicken Quesadilla,150,233.33,13.33,16.67,10.0,1.33,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+chicken_rice,Chicken Rice,350,154.0,9.1,19.5,4.8,0.6,MyFCD / Nutrient Composition of Malaysian Foods (IMR)
+chicken_wings,Chicken Wings,100,300.0,20.0,10.0,20.0,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+chilli_pan_mee,Chilli Pan Mee,350,129.0,7.8,18.2,3.5,2.3,Nutrient Composition of Malaysian Foods (IMR)
+chocolate_cake,Chocolate Cake,100,400.0,5.0,50.0,20.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+chocolate_mousse,Chocolate Mousse,100,300.0,5.0,25.0,20.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+churros,Churros,50,400.0,6.0,50.0,20.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+clam_chowder,Clam Chowder,200,125.0,5.0,10.0,6.0,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+club_sandwich,Club Sandwich,200,200.0,10.0,17.5,9.0,1.5,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+crab_cakes,Crab Cakes,100,250.0,15.0,10.0,15.0,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+creme_brulee,Creme Brulee,100,300.0,5.0,25.0,20.0,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+croque_madame,Croque Madame,200,225.0,10.0,15.0,12.5,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+cupcakes,Cupcakes,50,400.0,6.0,50.0,20.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+curry_puff,Curry Puff,80,284.0,4.9,31.5,14.8,2.2,MyFCD / Nutrient Composition of Malaysian Foods (IMR)
+deviled_eggs,Deviled Eggs,50,200.0,12.0,2.0,16.0,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+donuts,Donuts,50,400.0,6.0,50.0,20.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+dumplings,Dumplings,100,250.0,8.0,30.0,10.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+durian,Durian,100,147.0,1.5,27.1,5.3,3.8,MyFCD / USDA FoodData Central
+edamame,Edamame,100,120.0,11.0,10.0,5.0,5.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+eggs_benedict,Eggs Benedict,200,200.0,10.0,10.0,12.5,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+escargots,Escargots,100,200.0,15.0,5.0,12.0,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+falafel,Falafel,50,300.0,10.0,30.0,16.0,6.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+filet_mignon,Filet Mignon,150,250.0,20.0,0.0,16.67,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+fish_and_chips,Fish And Chips,200,250.0,10.0,20.0,12.5,1.5,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+foie_gras,Foie Gras,50,400.0,10.0,4.0,40.0,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+french_fries,French Fries,100,300.0,4.0,35.0,15.0,3.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+french_onion_soup,French Onion Soup,200,125.0,5.0,10.0,6.0,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+french_toast,French Toast,100,250.0,8.0,30.0,10.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+fried_calamari,Fried Calamari,100,300.0,15.0,20.0,15.0,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+fried_rice,Fried Rice,200,150.0,4.0,25.0,5.0,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+frozen_yogurt,Frozen Yogurt,100,150.0,4.0,25.0,3.0,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+gai_si_hor_fun,Gai Si Hor Fun,350,99.0,5.8,13.5,2.9,0.6,Nutrient Composition of Malaysian Foods (IMR)
+garlic_bread,Garlic Bread,50,300.0,8.0,40.0,12.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+gnocchi,Gnocchi,150,166.67,4.0,26.67,3.33,1.33,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+greek_salad,Greek Salad,200,125.0,4.0,7.5,9.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+grilled_cheese,Grilled Cheese,150,266.67,10.0,20.0,13.33,1.33,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+grilled_salmon,Grilled Salmon,150,200.0,23.33,0.0,10.0,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+guacamole,Guacamole,50,200.0,4.0,10.0,16.0,6.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+gyoza,Gyoza,100,200.0,8.0,20.0,8.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+hamburger,Hamburger,150,250.0,13.33,20.0,12.0,1.33,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+hokkien_mee,Hokkien Mee,300,149.0,8.1,19.5,4.6,1.2,MyFCD / Nutrient Composition of Malaysian Foods (IMR)
+hot_and_sour_soup,Hot And Sour Soup,200,75.0,4.0,7.5,2.5,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+hot_dog,Hot Dog,100,250.0,10.0,15.0,15.0,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+huevos_rancheros,Huevos Rancheros,200,150.0,7.5,10.0,7.5,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+hummus,Hummus,50,200.0,8.0,16.0,12.0,6.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+ice_cream,Ice Cream,100,200.0,4.0,25.0,10.0,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+kaya_toast,Kaya Toast,120,298.0,6.2,44.5,10.1,1.8,MyFCD / Nutrient Composition of Malaysian Foods (IMR)
+laksa,Laksa,400,92.0,4.3,12.1,3.2,1.0,MyFCD / Nutrient Composition of Malaysian Foods (IMR)
+lasagna,Lasagna,200,200.0,10.0,20.0,10.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+lobster_bisque,Lobster Bisque,200,125.0,5.0,7.5,7.5,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+lobster_roll,Lobster Roll,200,200.0,10.0,15.0,10.0,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+macaroni_and_cheese,Macaroni And Cheese,200,200.0,6.0,25.0,9.0,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+macarons,Macarons,50,400.0,6.0,50.0,20.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+mee_goreng,Mee Goreng,300,154.0,6.3,22.7,4.8,2.1,MyFCD / Nutrient Composition of Malaysian Foods (IMR)
+miso_soup,Miso Soup,200,50.0,3.0,5.0,1.5,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+murtabak,Murtabak,250,228.0,10.2,24.8,9.9,1.2,Nutrient Composition of Malaysian Foods (IMR)
+mussels,Mussels,150,133.33,16.67,3.33,5.33,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+nachos,Nachos,200,250.0,5.0,25.0,12.5,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+nasi_lemak,Nasi Lemak,300,164.0,4.8,21.5,6.9,1.2,MyFCD / Nutrient Composition of Malaysian Foods (IMR)
+omelette,Omelette,150,166.67,10.0,1.33,12.0,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+onion_rings,Onion Rings,100,300.0,4.0,35.0,15.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+oysters,Oysters,100,100.0,10.0,5.0,3.0,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+pad_thai,Pad Thai,200,200.0,7.5,30.0,6.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+paella,Paella,200,175.0,10.0,20.0,5.0,1.5,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+pancakes,Pancakes,100,250.0,6.0,35.0,8.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+panna_cotta,Panna Cotta,100,300.0,5.0,25.0,20.0,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+peking_duck,Peking Duck,150,266.67,20.0,6.67,16.67,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+pho,Pho,300,116.67,6.67,16.67,2.67,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+pisang_goreng,Pisang Goreng,120,209.0,1.9,31.8,8.4,1.9,MyFCD / Nutrient Composition of Malaysian Foods (IMR)
+pizza,Pizza,200,250.0,10.0,30.0,10.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+popiah,Popiah,110,118.0,3.9,17.6,3.8,2.1,MyFCD / Nutrient Composition of Malaysian Foods (IMR)
+pork_chop,Pork Chop,150,233.33,20.0,0.0,14.67,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+poutine,Poutine,200,250.0,5.0,25.0,12.5,1.5,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+prawn_mee,Prawn Mee,350,94.0,5.9,12.8,2.3,1.0,MyFCD / Nutrient Composition of Malaysian Foods (IMR)
+prime_rib,Prime Rib,200,300.0,20.0,0.0,22.5,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+pulled_pork_sandwich,Pulled Pork Sandwich,200,200.0,10.0,20.0,7.5,1.5,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+ramen,Ramen,300,133.33,5.0,20.0,3.33,1.33,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+ravioli,Ravioli,200,150.0,6.0,20.0,5.0,1.5,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+red_velvet_cake,Red Velvet Cake,100,350.0,5.0,45.0,18.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+rendang,Rendang,150,193.0,14.1,3.8,13.7,1.3,MyFCD / Nutrient Composition of Malaysian Foods (IMR)
+risotto,Risotto,200,150.0,4.0,25.0,4.0,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+roti_canai,Roti Canai,100,301.0,7.1,43.5,10.8,1.9,MyFCD / Nutrient Composition of Malaysian Foods (IMR)
+roti_john,Roti John,200,218.0,9.3,27.5,7.8,1.4,Nutrient Composition of Malaysian Foods (IMR)
+roti_tissue,Roti Tissue,80,318.0,5.8,49.5,10.3,1.1,Nutrient Composition of Malaysian Foods (IMR)
+samosa,Samosa,50,300.0,6.0,40.0,12.0,4.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+sashimi,Sashimi,100,150.0,25.0,0.0,5.0,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+satay,Satay,150,186.0,17.8,7.5,9.2,1.1,MyFCD / Nutrient Composition of Malaysian Foods (IMR)
+scallops,Scallops,100,120.0,20.0,2.0,3.0,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+seaweed_salad,Seaweed Salad,100,50.0,2.0,8.0,1.0,3.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+shawarma,Shawarma,200,213.0,11.8,21.5,8.4,2.1,USDA FoodData Central
+shrimp_and_grits,Shrimp And Grits,200,150.0,10.0,15.0,5.0,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+shumai,Shumai,100,143.0,9.8,13.5,5.1,1.2,USDA FoodData Central
+spaghetti_bolognese,Spaghetti Bolognese,200,175.0,7.5,20.0,6.0,1.5,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+spaghetti_carbonara,Spaghetti Carbonara,200,200.0,7.5,22.5,9.0,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+spring_rolls,Spring Rolls,50,200.0,6.0,30.0,8.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+steak,Steak,150,250.0,23.33,0.0,16.67,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+strawberry_shortcake,Strawberry Shortcake,100,300.0,4.0,40.0,12.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+sushi,Sushi,100,200.0,8.0,30.0,2.0,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+tacos,Tacos,100,250.0,10.0,20.0,12.0,3.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+takoyaki,Takoyaki,100,200.0,8.0,25.0,8.0,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+tandoori_chicken,Tandoori Chicken,200,158.0,22.3,2.9,6.1,0.5,USDA FoodData Central
+tepung_pelita,Tepung Pelita,100,178.0,2.8,29.5,5.3,0.6,Nutrient Composition of Malaysian Foods (IMR)
+tiramisu,Tiramisu,100,300.0,6.0,30.0,15.0,1.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+tuna_tartare,Tuna Tartare,100,150.0,20.0,2.0,5.0,0.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+waffles,Waffles,100,300.0,6.0,40.0,12.0,2.0,"Kaggle - Food-101 Nutritional Information (Sanaa Al-Ali, 2025)"
+wonton_mee,Wonton Mee,300,124.0,7.1,17.8,3.2,1.1,MyFCD / Nutrient Composition of Malaysian Foods (IMR)

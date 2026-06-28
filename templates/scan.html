@@ -1,0 +1,534 @@
+{% extends "base.html" %}
+{% block title %}Scan Food — NutriScan<style>
+.meal-type-btn {
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid var(--line);
+  background: var(--card);
+  color: var(--text-2);
+  transition: all 0.15s;
+}
+.meal-type-btn.active {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-title">Scan Food</div>
+  <div class="page-sub">Upload a photo to identify and log your meal</div>
+</div>
+
+<!-- Model selector -->
+<div style="margin-bottom:20px">
+  <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px">Recognition model</div>
+  <div class="model-pills">
+    {% for m in models %}
+    <button class="model-pill {% if m == 'Ensemble' %}active{% endif %}"
+            onclick="selectModel(this, '{{ m }}')"
+            title="Top-1 accuracy: {{ mode_acc[m] }}">
+      {{ m }}
+      <span style="font-size:10px;opacity:0.75;margin-left:3px">{{ mode_acc[m] }}</span>
+    </button>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Upload zone (shown by default) -->
+<div id="upload-section">
+  <div class="upload-zone" id="drop-zone">
+    <input type="file" id="file-input" accept="image/*"/>
+    <div class="upload-icon">📷</div>
+    <div class="upload-text">Take a photo or upload an image</div>
+    <div class="upload-hint">JPG, PNG, WEBP · Max 16 MB</div>
+  </div>
+</div>
+
+<!-- Loading spinner -->
+<div id="scan-loading" class="card">
+  <div class="spinner-wrap">
+    <div class="spinner"></div>
+    <div style="font-size:14px;color:var(--text-2);font-weight:600" id="loading-text">Analysing your food...</div>
+    <div style="font-size:12px;color:var(--text-3);margin-top:-8px" id="loading-sub">This may take a few seconds</div>
+  </div>
+</div>
+
+<!-- Scan result -->
+<div id="scan-result">
+  <!-- Image preview -->
+  <img id="result-img" class="preview-img" src="" alt="Scanned food"/>
+
+  <!-- Result card -->
+  <div class="card">
+    <div class="food-header">
+      <div class="food-emoji" id="food-emoji">🍽️</div>
+      <div>
+        <div class="food-name" id="food-name">—</div>
+        <div class="food-sub" id="food-serving">—</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px">
+          <div class="confidence-badge">
+            ✓ <span id="food-confidence">—</span> confidence
+          </div>
+          <!-- FIX: timing badge starts hidden -->
+          <div class="confidence-badge" style="background:var(--blue-light);color:var(--blue);display:none" id="timing-badge" title="Total inference time">
+            <i class="ti ti-clock" style="font-size:11px"></i> <span id="total-time">—</span>
+          </div>
+        </div>
+        <!-- Per-model timing breakdown (Ensemble only) -->
+        <div id="timing-breakdown" style="display:none;margin-top:8px;padding:10px 12px;background:var(--bg);border-radius:var(--radius-sm);font-size:12px">
+          <div style="font-weight:600;color:var(--text-2);margin-bottom:6px;font-size:11px;letter-spacing:0.05em">MODEL TIMING BREAKDOWN</div>
+          <div id="timing-rows"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calories -->
+    <div class="calorie-display">
+      <div class="calorie-num" id="food-calories">—</div>
+      <div class="calorie-unit">kcal</div>
+      <div class="calorie-sub" id="food-serving-label">per serving</div>
+    </div>
+
+    <!-- Macros -->
+    <div class="macro-row">
+      <div class="macro-card p">
+        <div class="macro-val" id="food-protein">—</div>
+        <div class="macro-unit">g</div>
+        <div class="macro-label">Protein</div>
+      </div>
+      <div class="macro-card c">
+        <div class="macro-val" id="food-carbs">—</div>
+        <div class="macro-unit">g</div>
+        <div class="macro-label">Carbs</div>
+      </div>
+      <div class="macro-card f">
+        <div class="macro-val" id="food-fat">—</div>
+        <div class="macro-unit">g</div>
+        <div class="macro-label">Fat</div>
+      </div>
+    </div>
+
+    <!-- Alternatives -->
+    <div class="alt-toggle" onclick="toggleAlts()">
+      <span>Other possibilities</span>
+      <i class="ti ti-chevron-down" id="alt-chevron"></i>
+    </div>
+    <div class="alt-list" id="alt-list" style="display:none"></div>
+
+    <hr class="divider"/>
+
+    <!-- Meal type selector -->
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px">Meal type</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="meal-type-btn active" onclick="selectMealType(this,'Breakfast')">Breakfast</button>
+        <button class="meal-type-btn" onclick="selectMealType(this,'Lunch')">Lunch</button>
+        <button class="meal-type-btn" onclick="selectMealType(this,'Snack')">Snack</button>
+        <button class="meal-type-btn" onclick="selectMealType(this,'Dinner')">Dinner</button>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-success" style="flex:1" onclick="confirmMeal()" id="confirm-btn">
+        <i class="ti ti-check"></i> Confirm Meal
+      </button>
+      <button class="btn btn-outline" style="color:var(--red);border-color:var(--red)" onclick="toggleCorrection()">
+        <i class="ti ti-x"></i> Wrong?
+      </button>
+      <button class="btn btn-outline" onclick="resetScan()">
+        <i class="ti ti-refresh"></i> Scan again
+      </button>
+    </div>
+
+    <!-- Correction panel (hidden by default) -->
+    <div id="correction-panel" style="display:none;margin-top:14px;border-top:1px solid var(--line);padding-top:14px">
+      <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:10px">
+        Select the correct food:
+      </div>
+
+      <!-- Top-5 quick picks -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--text-3);margin-bottom:6px">TOP PREDICTIONS</div>
+      <div id="correction-top5" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px"></div>
+
+      <!-- Search all 131 foods -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--text-3);margin-bottom:6px">SEARCH ALL FOODS</div>
+      <div style="position:relative;margin-bottom:6px">
+        <input type="text" id="food-search" placeholder="e.g. nasi goreng, pizza..."
+               oninput="filterFoods(this.value)"
+               style="padding-right:36px;width:100%"/>
+        <i class="ti ti-search" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text-3);pointer-events:none"></i>
+      </div>
+      <div id="food-search-results"
+           style="max-height:200px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--radius-sm);display:none">
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+.meal-type-btn {
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid var(--line);
+  background: var(--card);
+  color: var(--text-2);
+  transition: all 0.15s;
+}
+.meal-type-btn.active {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ── Food list for correction search ──────────────────────────────────────────
+const ALL_FOODS = {{ food_names | tojson }};
+
+// ── State ──────────────────────────────────────────────────────────────────────
+let selectedModel = 'Ensemble';
+let currentNutrition = null;
+let altsOpen = false;
+let selectedMealType = 'Breakfast';
+
+const FOOD_EMOJIS = {
+  nasi_lemak:'🍚', roti_canai:'🫓', satay:'🍢', laksa:'🍜', rendang:'🍛',
+  char_kway_teow:'🍜', chicken_rice:'🍗', mee_goreng:'🍝', curry_puff:'🥟',
+  apple_pie:'🥧', pizza:'🍕', hamburger:'🍔', sushi:'🍣', ramen:'🍜',
+  ice_cream:'🍦', chocolate_cake:'🎂', waffles:'🧇', pancakes:'🥞',
+  eggs_benedict:'🍳', default:'🍽️'
+};
+
+function getEmoji(label) {
+  return FOOD_EMOJIS[label] || FOOD_EMOJIS.default;
+}
+
+// ── Model selection ───────────────────────────────────────────────────────────
+function selectModel(btn, name) {
+  document.querySelectorAll('.model-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  selectedModel = name;
+}
+
+// ── Correction panel ─────────────────────────────────────────────────────────
+let correctionOpen = false;
+
+function toggleCorrection() {
+  correctionOpen = !correctionOpen;
+  const panel = document.getElementById('correction-panel');
+  panel.style.display = correctionOpen ? 'block' : 'none';
+
+  if (correctionOpen) {
+    // Populate top-5 options
+    const top5Container = document.getElementById('correction-top5');
+    top5Container.innerHTML = '';
+    if (window._lastTop5) {
+      window._lastTop5.forEach((item, i) => {
+        const btn = document.createElement('button');
+        btn.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;width:100%;font-size:13px;transition:background 0.12s';
+        btn.innerHTML = `<span style="font-weight:${i===0?700:500}">${item.name}</span><span style="color:var(--text-3);font-size:12px">${item.confidence.toFixed(1)}%</span>`;
+        btn.onmouseenter = () => btn.style.background = 'var(--bg)';
+        btn.onmouseleave = () => btn.style.background = 'var(--card)';
+        btn.onclick = () => applyCorrection(item.label, item.name);
+        top5Container.appendChild(btn);
+      });
+    }
+    document.getElementById('food-search').focus();
+  }
+}
+
+function filterFoods(query) {
+  const results = document.getElementById('food-search-results');
+  if (!query.trim()) { results.style.display = 'none'; return; }
+
+  const q = query.toLowerCase();
+  const matches = ALL_FOODS.filter(name => name.toLowerCase().includes(q)).slice(0, 10);
+
+  if (matches.length === 0) {
+    results.style.display = 'none';
+    return;
+  }
+
+  results.innerHTML = matches.map(name => {
+    const label = name.toLowerCase().replace(/ /g, '_');
+    return `<div onclick="applyCorrection('${label}', '${name.replace(/'/g, "\'")}')"
+      style="padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--line);transition:background 0.1s"
+      onmouseenter="this.style.background='var(--bg)'"
+      onmouseleave="this.style.background=''">${name}</div>`;
+  }).join('');
+  results.style.display = 'block';
+}
+
+async function applyCorrection(label, name) {
+  // Fetch nutrition for the corrected food
+  try {
+    const res  = await fetch(`/nutrition/${label}`);
+    const nut  = await res.json();
+    if (nut.error) { alert('Nutrition data not found for: ' + name); return; }
+
+    // Update displayed nutrition
+    currentNutrition = { ...nut, model_used: selectedModel + ' (corrected)' };
+    document.getElementById('food-emoji').textContent    = getEmoji(label);
+    document.getElementById('food-name').textContent     = nut.food_name;
+    document.getElementById('food-serving').textContent  = `Corrected by user · ${nut.serving_g}g serving`;
+    document.getElementById('food-serving-label').textContent = `per ${nut.serving_g}g serving`;
+    document.getElementById('food-calories').textContent = nut.calories;
+    document.getElementById('food-protein').textContent  = nut.protein;
+    document.getElementById('food-carbs').textContent    = nut.carbs;
+    document.getElementById('food-fat').textContent      = nut.fat;
+    document.getElementById('food-confidence').textContent = 'Manually corrected';
+
+    // Hide correction panel and show success state
+    document.getElementById('correction-panel').style.display = 'none';
+    document.getElementById('food-search').value = '';
+    document.getElementById('food-search-results').style.display = 'none';
+    correctionOpen = false;
+
+    // Visual feedback
+    const badge = document.querySelector('.confidence-badge');
+    badge.style.background = 'var(--blue-light)';
+    badge.style.color = 'var(--blue)';
+
+  } catch (e) {
+    alert('Could not load nutrition data. Please try again.');
+  }
+}
+
+function selectMealType(btn, type) {
+  document.querySelectorAll('.meal-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedMealType = type;
+}
+
+// ── File input / drag & drop ─────────────────────────────────────────────────
+const fileInput  = document.getElementById('file-input');
+const dropZone   = document.getElementById('drop-zone');
+
+fileInput.addEventListener('change', e => {
+  if (e.target.files[0]) uploadFile(e.target.files[0]);
+});
+
+dropZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  dropZone.classList.add('drag-over');
+});
+
+['dragleave', 'dragend'].forEach(ev =>
+  dropZone.addEventListener(ev, () => dropZone.classList.remove('drag-over'))
+);
+
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) uploadFile(file);
+});
+
+// ── Upload & predict ──────────────────────────────────────────────────────────
+async function uploadFile(file) {
+  show('scan-loading');
+  hide('upload-section');
+  hide('scan-result');
+
+  const loadingText = document.getElementById('loading-text');
+  const sub = document.getElementById('loading-sub');
+  if (selectedModel === 'Ensemble') {
+    loadingText.textContent = 'Running ensemble (3 models in parallel)…';
+    sub.textContent = 'Averaging predictions from MobileNetV2 + EfficientNetB0 + ResNet50';
+  } else {
+    loadingText.textContent = `Running ${selectedModel}…`;
+    sub.textContent = 'Processing your image';
+  }
+
+  const fd = new FormData();
+  fd.append('image', file);
+  fd.append('model', selectedModel);
+
+  try {
+    const res  = await fetch('/predict', { method: 'POST', body: fd });
+    const data = await res.json();
+
+    if (data.error) {
+      alert('Error: ' + data.error);
+      resetScan();
+      return;
+    }
+
+    showResult(data);
+  } catch (err) {
+    alert('Network error. Please try again.');
+    resetScan();
+  }
+}
+
+function showResult(data) {
+  hide('scan-loading');
+  show('scan-result');
+
+  // Image
+  document.getElementById('result-img').src = data.image_src;
+
+  const nut = data.nutrition;
+  if (!nut) {
+    document.getElementById('food-name').textContent = data.top5[0].name;
+    document.getElementById('food-calories').textContent = '—';
+    document.getElementById('food-serving').textContent = 'Nutrition data not available';
+    document.getElementById('food-protein').textContent = '—';
+    document.getElementById('food-carbs').textContent = '—';
+    document.getElementById('food-fat').textContent = '—';
+  } else {
+    document.getElementById('food-emoji').textContent    = getEmoji(nut.food_label);
+    document.getElementById('food-name').textContent     = nut.food_name;
+    document.getElementById('food-serving').textContent  = `${data.model_used} · ${nut.serving_g}g typical serving`;
+    document.getElementById('food-serving-label').textContent = `per ${nut.serving_g}g serving`;
+    document.getElementById('food-calories').textContent = nut.calories;
+    document.getElementById('food-protein').textContent  = nut.protein;
+    document.getElementById('food-carbs').textContent    = nut.carbs;
+    document.getElementById('food-fat').textContent      = nut.fat;
+    document.getElementById('food-confidence').textContent = data.top5[0].confidence.toFixed(1) + '%';
+
+    // Show timing info
+    if (data.total_ms !== undefined) {
+      const totalSec = (data.total_ms / 1000).toFixed(2);
+      document.getElementById('total-time').textContent = totalSec + 's';
+      document.getElementById('timing-badge').style.display = 'inline-flex';
+
+      // Show per-model breakdown for Ensemble
+      const timings = data.timings || {};
+      const keys = Object.keys(timings);
+      if (keys.length > 1) {
+        const breakdown = document.getElementById('timing-breakdown');
+        const rows = document.getElementById('timing-rows');
+        const maxMs = Math.max(...Object.values(timings));
+        rows.innerHTML = keys.map(model => {
+          const ms = timings[model];
+          const pct = Math.round((ms / maxMs) * 100);
+          const sec = (ms / 1000).toFixed(2);
+          return `<div style="margin-bottom:6px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+              <span style="color:var(--text)">${model}</span>
+              <span style="font-weight:600;color:var(--blue)">${sec}s</span>
+            </div>
+            <div style="background:var(--line);border-radius:999px;height:5px;overflow:hidden">
+              <div style="width:${pct}%;height:100%;background:var(--blue);border-radius:999px;transition:width 0.4s"></div>
+            </div>
+          </div>`;
+        }).join('');
+        breakdown.style.display = 'block';
+      } else {
+        document.getElementById('timing-breakdown').style.display = 'none';
+      }
+    }
+
+    currentNutrition = { ...nut, model_used: data.model_used };
+  }
+
+  // Store top5 for correction panel
+  window._lastTop5 = data.top5;
+
+  // Alternatives
+  const altList = document.getElementById('alt-list');
+  altList.innerHTML = data.top5.map((item, i) => `
+    <div class="alt-item ${i === 0 ? 'top1' : ''}" onclick="pickAlt('${item.label}', '${item.name}', ${item.confidence})">
+      <span class="alt-name">${i === 0 ? '✓ ' : ''}${item.name}</span>
+      <span class="alt-conf">${item.confidence.toFixed(1)}%</span>
+    </div>
+  `).join('');
+}
+
+async function pickAlt(label, name, confidence) {
+  // Re-fetch nutrition for the selected alternative
+  const res = await fetch(`/nutrition/${label}`);
+  if (res.ok) {
+    const nut = await res.json();
+    currentNutrition = { ...nut, model_used: selectedModel };
+    document.getElementById('food-emoji').textContent    = getEmoji(label);
+    document.getElementById('food-name').textContent     = nut.food_name;
+    document.getElementById('food-calories').textContent = nut.calories;
+    document.getElementById('food-protein').textContent  = nut.protein;
+    document.getElementById('food-carbs').textContent    = nut.carbs;
+    document.getElementById('food-fat').textContent      = nut.fat;
+    document.getElementById('food-confidence').textContent = confidence.toFixed(1) + '% (adjusted)';
+    document.getElementById('food-serving-label').textContent = `per ${nut.serving_g}g serving`;
+  }
+}
+
+async function confirmMeal() {
+  if (!currentNutrition) return;
+  const btn = document.getElementById('confirm-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  const res = await fetch('/log_meal', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...currentNutrition, meal_type: selectedMealType }),
+  });
+  const data = await res.json();
+  if (data.success) {
+    window.location.href = '/log';
+  } else {
+    alert('Failed to save meal.');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-check"></i> Confirm Meal';
+  }
+}
+
+function toggleAlts() {
+  altsOpen = !altsOpen;
+  document.getElementById('alt-list').style.display = altsOpen ? 'block' : 'none';
+  document.getElementById('alt-chevron').style.transform = altsOpen ? 'rotate(180deg)' : '';
+}
+
+// FIX: resetScan now fully cleans up all UI state
+function resetScan() {
+  currentNutrition = null;
+  fileInput.value  = '';
+  altsOpen = false;
+  correctionOpen = false;
+  hide('scan-loading');
+  hide('scan-result');
+  show('upload-section');
+  document.getElementById('timing-badge').style.display = 'none';
+  document.getElementById('timing-breakdown').style.display = 'none';
+  document.getElementById('alt-list').style.display = 'none';
+  document.getElementById('alt-chevron').style.transform = '';
+  document.getElementById('correction-panel').style.display = 'none';
+  document.getElementById('food-search').value = '';
+  document.getElementById('food-search-results').style.display = 'none';
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function show(id) { document.getElementById(id).style.display = 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+</script>
+<style>
+.meal-type-btn {
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid var(--line);
+  background: var(--card);
+  color: var(--text-2);
+  transition: all 0.15s;
+}
+.meal-type-btn.active {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+}
+</style>
+{% endblock %}

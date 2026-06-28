@@ -1,0 +1,445 @@
+{% extends "base.html" %}
+{% block title %}Food Log — NutriScan
+<!-- Edit Meal Modal -->
+<div id="edit-modal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.4);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);border-radius:var(--radius);padding:24px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-size:16px;font-weight:700">Edit Meal</div>
+      <button onclick="closeEdit()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-3)">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+
+    <!-- Current food name -->
+    <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px">Food</div>
+    <div id="edit-current-food" style="font-size:14px;font-weight:600;color:var(--text);padding:10px 12px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:8px"></div>
+
+    <!-- Search to change food -->
+    <div style="position:relative;margin-bottom:4px">
+      <input type="text" id="edit-food-search"
+             placeholder="Search to change food..."
+             oninput="filterEditFoods(this.value)"
+             style="padding-right:36px;width:100%;font-size:14px"/>
+      <i class="ti ti-search" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text-3);pointer-events:none"></i>
+    </div>
+    <div id="edit-food-results"
+         style="max-height:160px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--radius-sm);margin-bottom:16px;display:none">
+    </div>
+
+    <!-- Meal type -->
+    <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px">Meal Type</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+      <button class="edit-type-btn" onclick="selectEditType(this,'Breakfast')">Breakfast</button>
+      <button class="edit-type-btn" onclick="selectEditType(this,'Lunch')">Lunch</button>
+      <button class="edit-type-btn" onclick="selectEditType(this,'Snack')">Snack</button>
+      <button class="edit-type-btn" onclick="selectEditType(this,'Dinner')">Dinner</button>
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-success btn-full" onclick="saveEdit()" id="save-edit-btn">
+        <i class="ti ti-check"></i> Save Changes
+      </button>
+      <button class="btn btn-outline" onclick="closeEdit()">Cancel</button>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.edit-type-btn { padding:7px 16px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--line);background:var(--card);color:var(--text-2);transition:all 0.15s; }
+.edit-type-btn.active { background:var(--green);color:white;border-color:var(--green); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px">
+    <div class="page-title">{% if is_today %}Today's Log{% else %}Food Log{% endif %}</div>
+    <!-- Date picker -->
+    <input type="date" id="date-picker" value="{{ view_date }}"
+           max="{{ today_iso }}"
+           style="border:1.5px solid var(--line);border-radius:var(--radius-sm);padding:6px 10px;font-size:13px;color:var(--text);background:var(--card);cursor:pointer"/>
+  </div>
+  <!-- Prev / label / Next navigation -->
+  <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap">
+    <a href="/log?date={{ prev_date }}"
+       style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:1.5px solid var(--line);border-radius:50%;color:var(--text-2);text-decoration:none;font-size:16px">
+      <i class="ti ti-chevron-left"></i>
+    </a>
+    <span style="font-size:13px;color:var(--text-2);font-weight:500">{{ today_label }}</span>
+    {% if not is_today %}
+    <a href="/log?date={{ next_date }}"
+       style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:1.5px solid var(--line);border-radius:50%;color:var(--text-2);text-decoration:none;font-size:16px">
+      <i class="ti ti-chevron-right"></i>
+    </a>
+    <a href="/log"
+       style="font-size:12px;color:var(--amber-dark);font-weight:600;text-decoration:none;padding:4px 10px;border:1.5px solid var(--amber);border-radius:999px">
+      Today
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Macro summary -->
+<div class="stat-grid">
+  <div class="stat-card amber">
+    <div class="stat-value">{{ totals.calories | int }}</div>
+    <div class="stat-label">CALORIES (kcal)</div>
+  </div>
+  <div class="stat-card blue">
+    <div class="stat-value">{{ totals.protein | int }}g</div>
+    <div class="stat-label">PROTEIN</div>
+  </div>
+  <div class="stat-card red">
+    <div class="stat-value">{{ totals.carbs | int }}g</div>
+    <div class="stat-label">CARBS</div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-value">{{ totals.fat | int }}g</div>
+    <div class="stat-label">FAT</div>
+  </div>
+</div>
+
+{% if meals %}
+
+<!-- AI Advice button -->
+<div style="margin-bottom:20px">
+  <button class="btn btn-outline btn-full" onclick="getAdvice()" id="advice-btn" style="border-color:var(--amber);color:var(--amber-dark)">
+    <i class="ti ti-sparkles"></i> Get AI Dietary Advice
+  </button>
+  <div id="advice-panel" style="display:none;margin-top:12px;background:var(--amber-light);border:1.5px solid var(--amber);border-radius:var(--radius);padding:16px">
+    <div style="font-size:12px;font-weight:700;color:var(--amber-dark);margin-bottom:8px;letter-spacing:0.05em">AI NUTRITION ADVICE</div>
+    <div id="advice-text" style="font-size:14px;color:var(--text);line-height:1.7"></div>
+  </div>
+</div>
+
+<!-- Group meals by meal type -->
+{% set meal_types = ['Breakfast', 'Lunch', 'Snack', 'Dinner'] %}
+{% for meal_type in meal_types %}
+  {% set type_meals = meals | selectattr('meal_type', 'equalto', meal_type) | list %}
+  {% if type_meals %}
+  <div class="meal-group-label">{{ meal_type }}</div>
+
+  {% for meal in type_meals %}
+  <div class="meal-row" id="meal-{{ meal.id }}">
+    <div class="meal-icon">🍽️</div>
+    <div class="meal-info">
+      <div class="meal-name">{{ meal.food_name }}</div>
+      <div class="meal-time">
+        {{ meal.logged_at.strftime('%I:%M %p') }} ·
+        {{ meal.serving_g | int }}g serving
+        {% if meal.model_used %} · {{ meal.model_used }}{% endif %}
+      </div>
+    </div>
+    <div style="text-align:right;flex-shrink:0;margin-right:4px">
+      <div class="meal-cal">{{ meal.calories | int }}<span class="meal-kcal"> kcal</span></div>
+      <div style="font-size:10px;color:var(--text-3);margin-top:2px">
+        P {{ meal.protein | int }}g &nbsp;
+        C {{ meal.carbs | int }}g &nbsp;
+        F {{ meal.fat | int }}g
+      </div>
+    </div>
+    <button class="edit-btn" onclick="openEdit({{ meal.id }}, '{{ meal.food_label }}', '{{ meal.food_name }}', {{ meal.serving_g }}, '{{ meal.meal_type }}')"
+            title="Edit this meal" aria-label="Edit {{ meal.food_name }}">
+      <i class="ti ti-pencil" aria-hidden="true"></i>
+    </button>
+    <button class="delete-btn" onclick="deleteMeal({{ meal.id }})"
+            title="Delete this meal" aria-label="Delete {{ meal.food_name }}">
+      <i class="ti ti-trash" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <!-- Inline edit panel -->
+  <div id="edit-panel-{{ meal.id }}" style="display:none;margin-top:10px;background:var(--bg);border-radius:var(--radius-sm);padding:14px;border:1px solid var(--line)">
+    <div style="font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:10px;letter-spacing:0.05em">EDIT MEAL</div>
+
+    <!-- Meal type -->
+    <div style="margin-bottom:10px">
+      <div style="font-size:11px;font-weight:600;color:var(--text-3);margin-bottom:6px">MEAL TYPE</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="type-pills-{{ meal.id }}">
+        {% for t in ['Breakfast','Lunch','Snack','Dinner'] %}
+        <button class="meal-type-btn {% if meal.meal_type == t %}active{% endif %}"
+                onclick="selectEditType({{ meal.id }}, this, '{{ t }}')">{{ t }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Serving size -->
+    <div style="margin-bottom:10px">
+      <div style="font-size:11px;font-weight:600;color:var(--text-3);margin-bottom:6px">SERVING SIZE (g)</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="number" id="serving-{{ meal.id }}" value="{{ meal.serving_g | int }}" min="10" max="2000"
+               style="width:100px;padding:8px 10px;border:1.5px solid var(--line);border-radius:var(--radius-sm);font-size:14px"/>
+        <span style="font-size:12px;color:var(--text-3)">grams</span>
+      </div>
+    </div>
+
+    <!-- Change food -->
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;font-weight:600;color:var(--text-3);margin-bottom:6px">CHANGE FOOD (optional)</div>
+      <div style="position:relative">
+        <input type="text" id="food-edit-search-{{ meal.id }}"
+               placeholder="Search food to change..."
+               oninput="filterEditFoods({{ meal.id }}, this.value)"
+               style="padding-right:36px"/>
+        <i class="ti ti-search" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text-3);pointer-events:none"></i>
+      </div>
+      <div id="food-edit-results-{{ meal.id }}"
+           style="max-height:160px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--radius-sm);display:none;margin-top:4px"></div>
+      <div id="food-edit-selected-{{ meal.id }}" style="margin-top:6px;font-size:12px;color:var(--green);font-weight:600"></div>
+    </div>
+
+    <!-- Save / Cancel -->
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-success btn-sm" onclick="saveEdit({{ meal.id }})">
+        <i class="ti ti-check"></i> Save
+      </button>
+      <button class="btn btn-outline btn-sm" onclick="closeEdit({{ meal.id }})">Cancel</button>
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+{% endfor %}
+
+<hr class="divider"/>
+
+<!-- Fibre row -->
+<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--text-2);padding:4px 0">
+  <span>Dietary fibre</span>
+  <span style="font-weight:600">{{ totals.fiber }}g</span>
+</div>
+
+{% else %}
+<div class="empty">
+  <div class="empty-icon">🍽️</div>
+  <div class="empty-text">No meals logged today</div>
+  <div class="empty-sub">Scan a food photo to get started</div>
+</div>
+{% endif %}
+
+<div style="margin-top:20px">
+  <a href="{{ url_for('scan') }}" class="btn btn-primary btn-full">
+    <i class="ti ti-camera"></i> Scan a meal
+  </a>
+</div>
+
+{% endblock %}
+
+<style>
+.edit-btn { background:none; border:none; color:var(--text-3); cursor:pointer; font-size:18px; padding:4px; border-radius:6px; transition:color 0.15s, background 0.15s; flex-shrink:0; }
+.edit-btn:hover { color:var(--blue); background:var(--blue-light); }
+.meal-type-btn { padding:6px 12px; border-radius:999px; font-size:11px; font-weight:600; cursor:pointer; border:1.5px solid var(--line); background:var(--card); color:var(--text-2); transition:all 0.15s; }
+.meal-type-btn.active { background:var(--green); color:white; border-color:var(--green); }
+</style>
+{% block scripts %}
+<script>
+async function getAdvice() {
+  const btn  = document.getElementById('advice-btn');
+  const panel = document.getElementById('advice-panel');
+  const text  = document.getElementById('advice-text');
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader-2"></i> Analysing your meals...';
+  panel.style.display = 'block';
+  text.textContent = 'Thinking...';
+
+  try {
+    const res  = await fetch('/dietary_advice');
+    const data = await res.json();
+    text.textContent = data.advice;
+    btn.innerHTML = '<i class="ti ti-sparkles"></i> Refresh Advice';
+  } catch (e) {
+    text.textContent = 'Could not load advice. Please try again.';
+    btn.innerHTML = '<i class="ti ti-sparkles"></i> Get AI Dietary Advice';
+  }
+  btn.disabled = false;
+}
+
+
+// ── Food list for edit search ─────────────────────────────────────────────────
+const EDIT_FOODS = {{ food_names | default([]) | tojson }};
+
+// ── Date picker ──────────────────────────────────────────────────────────────
+// ── Edit meal ──────────────────────────────────────────────────────────────────
+let editMealId   = null;
+let editFoodLabel = null;
+let editMealType  = null;
+
+function openEdit(id, label, name, mealType) {
+  editMealId    = id;
+  editFoodLabel = label;
+  editMealType  = mealType;
+
+  document.getElementById('edit-current-food').textContent = name;
+  document.getElementById('edit-food-search').value = '';
+  document.getElementById('edit-food-results').style.display = 'none';
+
+  // Set active meal type button
+  document.querySelectorAll('.edit-type-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim() === mealType);
+  });
+
+  const modal = document.getElementById('edit-modal');
+  modal.style.display = 'flex';
+}
+
+function closeEdit() {
+  document.getElementById('edit-modal').style.display = 'none';
+  editMealId = editFoodLabel = editMealType = null;
+}
+
+function selectEditType(btn, type) {
+  document.querySelectorAll('.edit-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  editMealType = type;
+}
+
+function filterEditFoods(query) {
+  const results = document.getElementById('edit-food-results');
+  if (!query.trim()) { results.style.display = 'none'; return; }
+  const q = query.toLowerCase();
+  const matches = EDIT_FOODS.filter(n => n.toLowerCase().includes(q)).slice(0, 8);
+  if (!matches.length) { results.style.display = 'none'; return; }
+  results.innerHTML = matches.map(name => {
+    const label = name.toLowerCase().replace(/ /g, '_');
+    return `<div onclick="selectEditFood('${label}','${name.replace(/'/g,"\'")}')"
+      style="padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--line);transition:background 0.1s"
+      onmouseenter="this.style.background='var(--bg)'"
+      onmouseleave="this.style.background=''">${name}</div>`;
+  }).join('');
+  results.style.display = 'block';
+}
+
+function selectEditFood(label, name) {
+  editFoodLabel = label;
+  document.getElementById('edit-current-food').textContent = name;
+  document.getElementById('edit-food-search').value = '';
+  document.getElementById('edit-food-results').style.display = 'none';
+}
+
+async function saveEdit() {
+  if (!editMealId) return;
+  const btn = document.getElementById('save-edit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader-2"></i> Saving...';
+
+  const res  = await fetch(`/edit_meal/${editMealId}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ food_label: editFoodLabel, meal_type: editMealType }),
+  });
+  const data = await res.json();
+
+  if (data.success) {
+    closeEdit();
+    const d = new URLSearchParams(window.location.search).get('date'); window.location = d ? '/log?date=' + d : '/log';
+  } else {
+    alert('Failed to save. Please try again.');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-check"></i> Save Changes';
+  }
+}
+
+// Close modal when clicking backdrop
+document.getElementById('edit-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeEdit();
+});
+
+// ── Date picker ──────────────────────────────────────────────────────────────
+document.getElementById('date-picker').addEventListener('change', function() {
+  if (this.value) {
+    window.location.href = '/log?date=' + this.value;
+  }
+});
+
+// ── Edit meal ─────────────────────────────────────────────────────────────────
+const FOOD_LIST = {{ food_names | default([]) | tojson }};
+const editState = {};  // track selected food + type per meal
+
+function openEdit(id, label, name, serving, mealType) {
+  document.getElementById(`edit-panel-${id}`).style.display = 'block';
+  editState[id] = { label, name, mealType };
+}
+
+function closeEdit(id) {
+  document.getElementById(`edit-panel-${id}`).style.display = 'none';
+  document.getElementById(`food-edit-search-${id}`).value = '';
+  document.getElementById(`food-edit-results-${id}`).style.display = 'none';
+  document.getElementById(`food-edit-selected-${id}`).textContent = '';
+  delete editState[id];
+}
+
+function selectEditType(id, btn, type) {
+  document.querySelectorAll(`#type-pills-${id} .meal-type-btn`).forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (!editState[id]) editState[id] = {};
+  editState[id].mealType = type;
+}
+
+function filterEditFoods(id, query) {
+  const results = document.getElementById(`food-edit-results-${id}`);
+  if (!query.trim()) { results.style.display = 'none'; return; }
+
+  const q = query.toLowerCase();
+  const matches = FOOD_LIST.filter(n => n.toLowerCase().includes(q)).slice(0, 8);
+  if (!matches.length) { results.style.display = 'none'; return; }
+
+  results.innerHTML = matches.map(name => {
+    const label = name.toLowerCase().replace(/ /g, '_');
+    return `<div onclick="pickEditFood(${id}, '${label}', '${name.replace(/'/g, "\'")}')"
+      style="padding:9px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--line);transition:background 0.1s"
+      onmouseenter="this.style.background='var(--bg)'"
+      onmouseleave="this.style.background=''">${name}</div>`;
+  }).join('');
+  results.style.display = 'block';
+}
+
+function pickEditFood(id, label, name) {
+  if (!editState[id]) editState[id] = {};
+  editState[id].label = label;
+  editState[id].name  = name;
+  document.getElementById(`food-edit-search-${id}`).value = name;
+  document.getElementById(`food-edit-results-${id}`).style.display = 'none';
+  document.getElementById(`food-edit-selected-${id}`).textContent = `✓ Will change to: ${name}`;
+}
+
+async function saveEdit(id) {
+  const state    = editState[id] || {};
+  const servingEl = document.getElementById(`serving-${id}`);
+  const serving  = parseFloat(servingEl.value);
+
+  if (isNaN(serving) || serving < 10) {
+    alert('Please enter a valid serving size (minimum 10g).');
+    return;
+  }
+
+  const payload = { serving_g: serving, meal_type: state.mealType };
+  if (state.label) payload.food_label = state.label;
+
+  const res  = await fetch(`/edit_meal/${id}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+
+  if (data.success) {
+    const d = new URLSearchParams(window.location.search).get('date'); window.location = d ? '/log?date=' + d : '/log';
+  } else {
+    alert('Failed to save: ' + (data.error || 'Unknown error'));
+  }
+}
+
+async function deleteMeal(id) {
+  if (!confirm('Remove this meal from your log?')) return;
+  const res  = await fetch(`/delete_meal/${id}`, { method: 'POST' });
+  const data = await res.json();
+  if (data.success) {
+    document.getElementById(`meal-${id}`).remove();
+    // Refresh to update totals
+    const d = new URLSearchParams(window.location.search).get('date'); window.location = d ? '/log?date=' + d : '/log';
+  }
+}
+</script>
+{% endblock %}

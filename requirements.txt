@@ -1,0 +1,11 @@
+flask
+flask-sqlalchemy
+flask-login
+werkzeug
+numpy
+pandas
+pillow
+tensorflow==2.16.1
+gdown
+gunicorn
+psycopg2-binary

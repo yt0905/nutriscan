@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — NutriScan</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-card">
+
+    <div class="auth-logo">
+      <div class="sidebar-logo-icon">🍱</div>
+      <span class="sidebar-logo-text">NutriScan</span>
+    </div>
+
+    <div class="auth-title">Welcome back</div>
+    <div class="auth-sub">Log in to track your nutrition</div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('login') }}">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email"
+               placeholder="you@email.com" required autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password"
+               placeholder="••••••••" required autocomplete="current-password"/>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" style="margin-top:8px">
+        Log in
+      </button>
+    </form>
+
+    <div class="auth-switch">
+      Don't have an account? <a href="{{ url_for('register') }}">Sign up</a>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

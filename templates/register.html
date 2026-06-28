@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register — NutriScan</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-card">
+
+    <div class="auth-logo">
+      <div class="sidebar-logo-icon">🍱</div>
+      <span class="sidebar-logo-text">NutriScan</span>
+    </div>
+
+    <div class="auth-title">Create account</div>
+    <div class="auth-sub">Start tracking your diet today</div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('register') }}">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username"
+               placeholder="e.g. yeethong" required autocomplete="username"/>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email"
+               placeholder="you@email.com" required autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label for="password">Password <span style="color:var(--text-3);font-weight:400">(min. 6 characters)</span></label>
+        <input type="password" id="password" name="password"
+               placeholder="••••••••" required autocomplete="new-password" minlength="6"/>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" style="margin-top:8px">
+        Create account
+      </button>
+    </form>
+
+    <div class="auth-switch">
+      Already have an account? <a href="{{ url_for('login') }}">Log in</a>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
