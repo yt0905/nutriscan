@@ -77,7 +77,7 @@
           </div>
           <!-- FIX: timing badge starts hidden -->
           <div class="confidence-badge" style="background:var(--blue-light);color:var(--blue);display:none" id="timing-badge" title="Total inference time">
-            <i class="ti ti-clock" style="font-size:11px"></i> <span id="total-time">—</span>
+            ⏱ <span id="total-time">—</span>
           </div>
         </div>
         <!-- Per-model timing breakdown (Ensemble only) -->
@@ -117,7 +117,7 @@
     <!-- Alternatives -->
     <div class="alt-toggle" onclick="toggleAlts()">
       <span>Other possibilities</span>
-      <i class="ti ti-chevron-down" id="alt-chevron"></i>
+      <span id="alt-chevron">▼</span>
     </div>
     <div class="alt-list" id="alt-list" style="display:none"></div>
 
@@ -137,13 +137,13 @@
     <!-- Action buttons -->
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <button class="btn btn-success" style="flex:1" onclick="confirmMeal()" id="confirm-btn">
-        <i class="ti ti-check"></i> Confirm Meal
+        ✓ Confirm Meal
       </button>
       <button class="btn btn-outline" style="color:var(--red);border-color:var(--red)" onclick="toggleCorrection()">
-        <i class="ti ti-x"></i> Wrong?
+        ✕ Wrong?
       </button>
       <button class="btn btn-outline" onclick="resetScan()">
-        <i class="ti ti-refresh"></i> Scan again
+        ↺ Scan again
       </button>
     </div>
 
@@ -163,7 +163,7 @@
         <input type="text" id="food-search" placeholder="e.g. nasi goreng, pizza..."
                oninput="filterFoods(this.value)"
                style="padding-right:36px;width:100%"/>
-        <i class="ti ti-search" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text-3);pointer-events:none"></i>
+        
       </div>
       <div id="food-search-results"
            style="max-height:200px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--radius-sm);display:none">
@@ -481,7 +481,7 @@ async function confirmMeal() {
   } else {
     alert('Failed to save meal.');
     btn.disabled = false;
-    btn.innerHTML = '<i class="ti ti-check"></i> Confirm Meal';
+    btn.innerHTML = '✓ Confirm Meal';
   }
 }
 

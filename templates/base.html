@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>{% block title %}NutriScan{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.19.0/tabler-icons.min.css"/>
-  {% block head %}{% endblock %}
+    {% block head %}{% endblock %}
 </head>
 <body>
 
@@ -21,15 +20,15 @@
     <nav class="sidebar-nav">
       <a href="{{ url_for('scan') }}"
          class="nav-item {% if request.endpoint == 'scan' %}active{% endif %}">
-        <i class="ti ti-camera nav-icon" aria-hidden="true"></i> Scan
+        📷 Scan
       </a>
       <a href="{{ url_for('log') }}"
          class="nav-item {% if request.endpoint == 'log' %}active{% endif %}">
-        <i class="ti ti-notebook nav-icon" aria-hidden="true"></i> Food Log
+        📋 Food Log
       </a>
       <a href="{{ url_for('dashboard') }}"
          class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
-        <i class="ti ti-chart-bar nav-icon" aria-hidden="true"></i> Dashboard
+        📊 Dashboard
       </a>
     </nav>
 
@@ -42,7 +41,7 @@
         </div>
       </div>
       <a href="{{ url_for('logout') }}" class="logout-btn">
-        <i class="ti ti-logout" aria-hidden="true"></i> Log out
+        ↩ Log out
       </a>
     </div>
   </aside>
@@ -63,17 +62,17 @@
 <nav class="bottom-nav" aria-label="Main navigation">
   <a href="{{ url_for('scan') }}"
      class="bottom-nav-item {% if request.endpoint == 'scan' %}active{% endif %}">
-    <i class="ti ti-camera nav-icon" aria-hidden="true"></i>
+    📷
     Scan
   </a>
   <a href="{{ url_for('log') }}"
      class="bottom-nav-item {% if request.endpoint == 'log' %}active{% endif %}">
-    <i class="ti ti-notebook nav-icon" aria-hidden="true"></i>
+    📋
     Log
   </a>
   <a href="{{ url_for('dashboard') }}"
      class="bottom-nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
-    <i class="ti ti-chart-bar nav-icon" aria-hidden="true"></i>
+    📊
     Dashboard
   </a>
 </nav>
