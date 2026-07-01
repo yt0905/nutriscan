@@ -1,56 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Food Log — NutriScan
-<!-- Edit Meal Modal -->
-<div id="edit-modal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.4);align-items:center;justify-content:center;padding:20px">
-  <div style="background:var(--card);border-radius:var(--radius);padding:24px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
-
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div style="font-size:16px;font-weight:700">Edit Meal</div>
-      <button onclick="closeEdit()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-3)">
-        ✕
-      </button>
-    </div>
-
-    <!-- Current food name -->
-    <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px">Food</div>
-    <div id="edit-current-food" style="font-size:14px;font-weight:600;color:var(--text);padding:10px 12px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:8px"></div>
-
-    <!-- Search to change food -->
-    <div style="position:relative;margin-bottom:4px">
-      <input type="text" id="edit-food-search"
-             placeholder="Search to change food..."
-             oninput="filterEditFoods(this.value)"
-             style="padding-right:36px;width:100%;font-size:14px"/>
-      
-    </div>
-    <div id="edit-food-results"
-         style="max-height:160px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--radius-sm);margin-bottom:16px;display:none">
-    </div>
-
-    <!-- Meal type -->
-    <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px">Meal Type</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
-      <button class="edit-type-btn" onclick="selectEditType(this,'Breakfast')">Breakfast</button>
-      <button class="edit-type-btn" onclick="selectEditType(this,'Lunch')">Lunch</button>
-      <button class="edit-type-btn" onclick="selectEditType(this,'Snack')">Snack</button>
-      <button class="edit-type-btn" onclick="selectEditType(this,'Dinner')">Dinner</button>
-    </div>
-
-    <div style="display:flex;gap:10px">
-      <button class="btn btn-success btn-full" onclick="saveEdit()" id="save-edit-btn">
-        ✓ Save Changes
-      </button>
-      <button class="btn btn-outline" onclick="closeEdit()">Cancel</button>
-    </div>
-
-  </div>
-</div>
-
-<style>
-.edit-type-btn { padding:7px 16px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--line);background:var(--card);color:var(--text-2);transition:all 0.15s; }
-.edit-type-btn.active { background:var(--green);color:white;border-color:var(--green); }
-</style>
-{% endblock %}
+{% block title %}Food Log — NutriScan{% endblock %}
 
 {% block content %}
 <div class="page-header">
@@ -175,6 +124,13 @@
       </div>
     </div>
 
+    <!-- Date -->
+    <div style="margin-bottom:10px">
+      <div style="font-size:11px;font-weight:600;color:var(--text-3);margin-bottom:6px">DATE</div>
+      <input type="date" id="date-{{ meal.id }}" value="{{ meal.logged_at.strftime('%Y-%m-%d') }}"
+             style="padding:8px 10px;border:1.5px solid var(--line);border-radius:var(--radius-sm);font-size:14px;background:var(--card);color:var(--text)"/>
+    </div>
+
     <!-- Change food -->
     <div style="margin-bottom:12px">
       <div style="font-size:11px;font-weight:600;color:var(--text-3);margin-bottom:6px">CHANGE FOOD (optional)</div>
@@ -234,16 +190,15 @@
 </style>
 {% block scripts %}
 <script>
+// ── AI Advice ─────────────────────────────────────────────────────────────────
 async function getAdvice() {
-  const btn  = document.getElementById('advice-btn');
+  const btn   = document.getElementById('advice-btn');
   const panel = document.getElementById('advice-panel');
   const text  = document.getElementById('advice-text');
-
   btn.disabled = true;
   btn.innerHTML = '⏳ Analysing your meals...';
   panel.style.display = 'block';
   text.textContent = 'Thinking...';
-
   try {
     const res  = await fetch('/dietary_advice');
     const data = await res.json();
@@ -256,110 +211,26 @@ async function getAdvice() {
   btn.disabled = false;
 }
 
-
-// ── Food list for edit search ─────────────────────────────────────────────────
-const EDIT_FOODS = {{ food_names | default([]) | tojson }};
-
-// ── Date picker ──────────────────────────────────────────────────────────────
-// ── Edit meal ──────────────────────────────────────────────────────────────────
-let editMealId   = null;
-let editFoodLabel = null;
-let editMealType  = null;
-
-function openEdit(id, label, name, mealType) {
-  editMealId    = id;
-  editFoodLabel = label;
-  editMealType  = mealType;
-
-  document.getElementById('edit-current-food').textContent = name;
-  document.getElementById('edit-food-search').value = '';
-  document.getElementById('edit-food-results').style.display = 'none';
-
-  // Set active meal type button
-  document.querySelectorAll('.edit-type-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent.trim() === mealType);
-  });
-
-  const modal = document.getElementById('edit-modal');
-  modal.style.display = 'flex';
-}
-
-function closeEdit() {
-  document.getElementById('edit-modal').style.display = 'none';
-  editMealId = editFoodLabel = editMealType = null;
-}
-
-function selectEditType(btn, type) {
-  document.querySelectorAll('.edit-type-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  editMealType = type;
-}
-
-function filterEditFoods(query) {
-  const results = document.getElementById('edit-food-results');
-  if (!query.trim()) { results.style.display = 'none'; return; }
-  const q = query.toLowerCase();
-  const matches = EDIT_FOODS.filter(n => n.toLowerCase().includes(q)).slice(0, 8);
-  if (!matches.length) { results.style.display = 'none'; return; }
-  results.innerHTML = matches.map(name => {
-    const label = name.toLowerCase().replace(/ /g, '_');
-    return `<div onclick="selectEditFood('${label}','${name.replace(/'/g,"\'")}')"
-      style="padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--line);transition:background 0.1s"
-      onmouseenter="this.style.background='var(--bg)'"
-      onmouseleave="this.style.background=''">${name}</div>`;
-  }).join('');
-  results.style.display = 'block';
-}
-
-function selectEditFood(label, name) {
-  editFoodLabel = label;
-  document.getElementById('edit-current-food').textContent = name;
-  document.getElementById('edit-food-search').value = '';
-  document.getElementById('edit-food-results').style.display = 'none';
-}
-
-async function saveEdit() {
-  if (!editMealId) return;
-  const btn = document.getElementById('save-edit-btn');
-  btn.disabled = true;
-  btn.innerHTML = '⏳ Saving...';
-
-  const res  = await fetch(`/edit_meal/${editMealId}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ food_label: editFoodLabel, meal_type: editMealType }),
-  });
-  const data = await res.json();
-
-  if (data.success) {
-    closeEdit();
-    const d = new URLSearchParams(window.location.search).get('date'); window.location = d ? '/log?date=' + d : '/log';
-  } else {
-    alert('Failed to save. Please try again.');
-    btn.disabled = false;
-    btn.innerHTML = '✓ Save Changes';
-  }
-}
-
-// Close modal when clicking backdrop
-document.getElementById('edit-modal').addEventListener('click', function(e) {
-  if (e.target === this) closeEdit();
-});
-
-// ── Date picker ──────────────────────────────────────────────────────────────
+// ── Date picker ───────────────────────────────────────────────────────────────
 document.getElementById('date-picker').addEventListener('change', function() {
-  if (this.value) {
-    window.location.href = '/log?date=' + this.value;
-  }
+  if (this.value) window.location.href = '/log?date=' + this.value;
 });
 
-// ── Edit meal ─────────────────────────────────────────────────────────────────
+// ── Inline edit panel ─────────────────────────────────────────────────────────
 const FOOD_LIST = {{ food_names | default([]) | tojson }};
-const editState = {};  // track selected food + type per meal
+const editState = {};
 
 function openEdit(id, label, name, serving, mealType) {
-  document.getElementById(`edit-panel-${id}`).style.display = 'block';
-  editState[id] = { label, name, mealType };
+  // Close any other open panels first
+  document.querySelectorAll('[id^="edit-panel-"]').forEach(p => {
+    if (p.id !== `edit-panel-${id}`) p.style.display = 'none';
+  });
+  const panel = document.getElementById(`edit-panel-${id}`);
+  const isOpen = panel.style.display === 'block';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    editState[id] = { label, name, mealType, serving };
+  }
 }
 
 function closeEdit(id) {
@@ -380,11 +251,9 @@ function selectEditType(id, btn, type) {
 function filterEditFoods(id, query) {
   const results = document.getElementById(`food-edit-results-${id}`);
   if (!query.trim()) { results.style.display = 'none'; return; }
-
   const q = query.toLowerCase();
   const matches = FOOD_LIST.filter(n => n.toLowerCase().includes(q)).slice(0, 8);
   if (!matches.length) { results.style.display = 'none'; return; }
-
   results.innerHTML = matches.map(name => {
     const label = name.toLowerCase().replace(/ /g, '_');
     return `<div onclick="pickEditFood(${id}, '${label}', '${name.replace(/'/g, "\'")}')"
@@ -405,29 +274,43 @@ function pickEditFood(id, label, name) {
 }
 
 async function saveEdit(id) {
-  const state    = editState[id] || {};
+  const state     = editState[id] || {};
   const servingEl = document.getElementById(`serving-${id}`);
-  const serving  = parseFloat(servingEl.value);
+  const dateEl    = document.getElementById(`date-${id}`);
+  const serving   = parseFloat(servingEl.value);
 
   if (isNaN(serving) || serving < 10) {
     alert('Please enter a valid serving size (minimum 10g).');
     return;
   }
 
-  const payload = { serving_g: serving, meal_type: state.mealType };
+  const btn = document.querySelector(`#edit-panel-${id} .btn-success`);
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+  const payload = {
+    serving_g:   serving,
+    meal_type:   state.mealType || null,
+    logged_date: dateEl ? dateEl.value : null,
+  };
   if (state.label) payload.food_label = state.label;
 
-  const res  = await fetch(`/edit_meal/${id}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  const data = await res.json();
-
-  if (data.success) {
-    const d = new URLSearchParams(window.location.search).get('date'); window.location = d ? '/log?date=' + d : '/log';
-  } else {
-    alert('Failed to save: ' + (data.error || 'Unknown error'));
+  try {
+    const res  = await fetch(`/edit_meal/${id}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (data.success) {
+      const d = new URLSearchParams(window.location.search).get('date');
+      window.location = d ? '/log?date=' + d : '/log';
+    } else {
+      alert('Failed to save: ' + (data.error || 'Unknown error'));
+      if (btn) { btn.disabled = false; btn.textContent = '✓ Save'; }
+    }
+  } catch (e) {
+    alert('Network error. Please try again.');
+    if (btn) { btn.disabled = false; btn.textContent = '✓ Save'; }
   }
 }
 
@@ -436,9 +319,8 @@ async function deleteMeal(id) {
   const res  = await fetch(`/delete_meal/${id}`, { method: 'POST' });
   const data = await res.json();
   if (data.success) {
-    document.getElementById(`meal-${id}`).remove();
-    // Refresh to update totals
-    const d = new URLSearchParams(window.location.search).get('date'); window.location = d ? '/log?date=' + d : '/log';
+    const d = new URLSearchParams(window.location.search).get('date');
+    window.location = d ? '/log?date=' + d : '/log';
   }
 }
 </script>

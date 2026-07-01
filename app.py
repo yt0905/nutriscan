@@ -272,34 +272,39 @@ def edit_meal(meal_id):
         return jsonify({'error': 'Forbidden'}), 403
     d = request.get_json()
 
-    if 'food_label' in d and d['food_label'] != meal.food_label:
-        label = d['food_label']
-        if label not in NUTRITION.index:
-            return jsonify({'error': 'Food not found'}), 404
-        row = NUTRITION.loc[label]
-        s   = float(d.get('serving_g', row['serving_size_g'])) / 100
-        meal.food_label = label
-        meal.food_name  = str(row['food_name_display'])
-        meal.calories   = round(float(row['calories_per_100g']) * s, 1)
-        meal.protein    = round(float(row['protein_per_100g'])  * s, 1)
-        meal.carbs      = round(float(row['carbs_per_100g'])    * s, 1)
-        meal.fat        = round(float(row['fat_per_100g'])      * s, 1)
-        meal.fiber      = round(float(row['fiber_per_100g'])    * s, 1)
-        meal.serving_g  = float(d.get('serving_g', row['serving_size_g']))
-    elif 'serving_g' in d:
-        old_s = meal.serving_g
-        new_s = float(d['serving_g'])
-        if old_s > 0 and new_s > 0:
-            ratio = new_s / old_s
-            meal.calories = round(meal.calories * ratio, 1)
-            meal.protein  = round(meal.protein  * ratio, 1)
-            meal.carbs    = round(meal.carbs    * ratio, 1)
-            meal.fat      = round(meal.fat      * ratio, 1)
-            meal.fiber    = round(meal.fiber    * ratio, 1)
-            meal.serving_g = new_s
+    # Use new food label if provided, otherwise keep existing
+    label  = d.get('food_label', meal.food_label)
+    new_s  = float(d.get('serving_g', meal.serving_g))
 
-    if 'meal_type' in d:
+    if new_s < 10:
+        return jsonify({'error': 'Serving size too small (min 10g)'}), 400
+
+    if label not in NUTRITION.index:
+        return jsonify({'error': 'Food not found'}), 404
+
+    # Always recalculate nutrition from scratch using label + serving
+    row = NUTRITION.loc[label]
+    s   = new_s / 100
+    meal.food_label = label
+    meal.food_name  = str(row['food_name_display'])
+    meal.calories   = round(float(row['calories_per_100g']) * s, 1)
+    meal.protein    = round(float(row['protein_per_100g'])  * s, 1)
+    meal.carbs      = round(float(row['carbs_per_100g'])    * s, 1)
+    meal.fat        = round(float(row['fat_per_100g'])      * s, 1)
+    meal.fiber      = round(float(row['fiber_per_100g'])    * s, 1)
+    meal.serving_g  = new_s
+
+    if 'meal_type' in d and d['meal_type']:
         meal.meal_type = d['meal_type']
+
+    if 'logged_date' in d and d['logged_date']:
+        try:
+            from datetime import datetime as dt2
+            new_date = dt2.strptime(d['logged_date'], '%Y-%m-%d')
+            orig = meal.logged_at
+            meal.logged_at = orig.replace(year=new_date.year, month=new_date.month, day=new_date.day)
+        except ValueError:
+            return jsonify({'error': 'Invalid date format'}), 400
 
     db.session.commit()
     return jsonify({
